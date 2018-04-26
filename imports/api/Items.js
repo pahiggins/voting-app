@@ -1,6 +1,23 @@
 import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
 const Items = new Mongo.Collection('items');
+
+const ItemSchema = new SimpleSchema({
+  text: String,
+  value: SimpleSchema.Integer
+});
+
+const ItemsSchema = new SimpleSchema({
+  itemOne: ItemSchema,
+  itemTwo: ItemSchema,
+  lastUpdated: {
+    type: Date,
+    optional: true
+  }
+});
+
+Items.attachSchema(ItemsSchema);
 
 if (Meteor.isServer) {
   Meteor.publish('allItems', function() {
@@ -9,8 +26,6 @@ if (Meteor.isServer) {
 
   Meteor.methods({
     insertNewItem(itemOne, itemTwo) {
-      check(itemOne, String);
-      check(itemTwo, String);
       Items.insert({
         itemOne: {
           text: itemOne,
@@ -23,7 +38,6 @@ if (Meteor.isServer) {
       });
     },
     voteOnItem(item, position) {
-      check(item, Object);
       let lastUpdated = new Date();
       if (Meteor.userId()) {
         if (position === 'itemOne') {

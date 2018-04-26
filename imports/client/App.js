@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
-import { LoginButtons } from 'meteor/okgrow:accounts-ui-react';
+import { autobind } from 'core-decorators';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import Items from '../api/Items';
 import Item from './Item';
+import IsRole from './utilities/IsRole';
 
+// @autobind
 class App extends Component {
   addItems(event) {
     event.preventDefault();
@@ -33,35 +36,48 @@ class App extends Component {
     }
 
     return (
-      <div>
-        <h1>Level Up Voting</h1>
-        <LoginButtons />
-        <button onClick={this.showAll.bind(this)}>
-          Show {this.props.showAll ? 'One' : 'All'}
-        </button>
-        <main>
-          <form className="new-items" onSubmit={this.addItems.bind(this)}>
-            <input type='text' ref='itemOne' />
-            <input type='text' ref='itemTwo' />
-            <button type='submit'>Add Items</button>
-          </form>
+      <main>
+        <isRole role='admin'>
+          <button onClick={this.showAll.bind(this)}>
+            Show {this.props.showAll ? 'One' : 'All'}
+          </button>
+        </isRole>
+        <form className="new-items" onSubmit={this.addItems.bind(this)}>
+          <input type='text' ref='itemOne' />
+          <input type='text' ref='itemTwo' />
+          <button type='submit'>Add Items</button>
+        </form>
+        <ReactCSSTransitionGroup
+          transitionName="item"
+          transitionEnterTimeout={600}
+          transitionLeaveTimeout={600}
+          transitionAppear={true}
+          transitionAppearTimeout={600}
+        >
           {this.props.items.map(item => <Item key={item._id} item={item} />)}
-        </main>
-      </div>
+        </ReactCSSTransitionGroup>
+      </main>
     );
   }
 }
 
-export default createContainer(() => {
+export default createContainer(({ params }) => {
   let itemsSub = Meteor.subscribe('allItems');
   let showAll = Session.get('showAll');
+  let itemsArray;
+
+  if (params.id) {
+    itemsArray = Items.find({ _id: params.id }).fetch();
+  } else {
+    itemsArray = Items.find({}, {
+      limit: showAll ? 50 : 1,
+      sort: { lastUpdated: 1 }
+    }).fetch()
+  }
 
   return {
     showAll,
     ready: itemsSub.ready(),
-    items: Items.find({}, {
-      limit: showAll ? 50 : 1,
-      sort: { lastUpdated: 1 }
-    }).fetch()
+    items: itemsArray
   }
 }, App);

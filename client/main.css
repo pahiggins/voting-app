@@ -435,7 +435,8 @@ main {
   padding: 20px;
 }
 input[type='text'] {
-  width: 45%;
+  width: 100%;
+  margin-top: 10px;
 }
 button[type='submit'] {
   width: 100%;
@@ -483,9 +484,9 @@ button[type='submit'] {
   background: #EEE;
 }
 
-.new-items {
+/* .new-items {
   display: flex;
-}
+} */
 
 .item-enter, .item-appear {
   opacity: 0;

@@ -42,10 +42,10 @@ class App extends Component {
             Show {this.props.showAll ? 'One' : 'All'}
           </button>
         </isRole>
-        <form className="new-items" onSubmit={this.addItems.bind(this)}>
-          <input type='text' ref='itemOne' />
-          <input type='text' ref='itemTwo' />
-          <button type='submit'>Add Items</button>
+        <form  onSubmit={this.addItems.bind(this)}>
+          <input className="form-control" type='text' ref='itemOne' placeholder="Item One" />
+          <input className="form-control" type='text' ref='itemTwo' placeholder="Item Two" />
+          <button type='submit' className="btn btn-default">Add Items</button>
         </form>
         <ReactCSSTransitionGroup
           transitionName="item"
